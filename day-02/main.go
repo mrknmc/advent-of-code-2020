@@ -44,8 +44,6 @@ func main() {
 			validPart2++
 		}
 	}
-	// Part 1
 	fmt.Println("valid part 1: ", validPart1)
 	fmt.Println("valid part 2: ", validPart2)
-
 }
