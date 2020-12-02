@@ -39,7 +39,8 @@ func main() {
 		if countMap[letter] >= low && countMap[letter] <= high {
 			validPart1++
 		}
-		if (string(password[low-1]) == letter && string(password[high-1]) != letter) || (string(password[low-1]) != letter && string(password[high-1]) == letter) {
+		if (string(password[low-1]) == letter && string(password[high-1]) != letter) ||
+			(string(password[low-1]) != letter && string(password[high-1]) == letter) {
 			validPart2++
 		}
 	}
