@@ -67,24 +67,20 @@ func main() {
 				break
 			}
 		}
-		invalid := false
 
 		if val, ok := passport["byr"]; !ok || !byrRegex.MatchString(val) {
-			invalid = true
+			invalidPart2++
 		} else if val, ok := passport["iyr"]; !ok || !iyrRegex.MatchString(val) {
-			invalid = true
+			invalidPart2++
 		} else if val, ok := passport["eyr"]; !ok || !eyrRegex.MatchString(val) {
-			invalid = true
+			invalidPart2++
 		} else if val, ok := passport["hgt"]; !ok || !hgtRegex.MatchString(val) {
-			invalid = true
+			invalidPart2++
 		} else if val, ok := passport["hcl"]; !ok || !hclRegex.MatchString(val) {
-			invalid = true
+			invalidPart2++
 		} else if val, ok := passport["ecl"]; !ok || !eclRegex.MatchString(val) {
-			invalid = true
+			invalidPart2++
 		} else if val, ok := passport["pid"]; !ok || !pidRegex.MatchString(val) {
-			invalid = true
-		}
-		if invalid {
 			invalidPart2++
 		}
 	}
