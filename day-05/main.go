@@ -17,8 +17,7 @@ func main() {
 		rowHigh := 127
 		rowLow := 0
 
-		rowIndex := line[0:7]
-		for _, i := range rowIndex {
+		for _, i := range line[0:7] {
 			pivot := rowLow + (rowHigh+1-rowLow)/2
 			if i == 'F' {
 				rowHigh = pivot - 1
@@ -32,8 +31,7 @@ func main() {
 
 		colHigh := 7
 		colLow := 0
-		colIndex := line[7:10]
-		for _, i := range colIndex {
+		for _, i := range line[7:10] {
 			pivot := colLow + (colHigh+1-colLow)/2
 			if i == 'L' {
 				colHigh = pivot - 1
@@ -44,6 +42,7 @@ func main() {
 		if colLow != colHigh {
 			panic("high and low should be equal")
 		}
+
 		seatID := rowLow*8 + colLow
 		seats[seatID] = 1
 		if seatID > maxSeatID {
