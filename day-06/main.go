@@ -34,31 +34,22 @@ func main() {
 	groups := parseFile(file)
 
 	unions := 0
-	for _, group := range groups {
-		union := make(map[string]int)
-		for _, person := range group {
-			for k := range person {
-				union[k]++
-			}
-		}
-		unions += len(union)
-	}
-	fmt.Println("Union: ", unions)
-
 	intersections := 0
 	for _, group := range groups {
 		groupSize := len(group)
-		intersection := make(map[string]int)
+		counter := make(map[string]int)
 		for _, person := range group {
 			for k := range person {
-				intersection[k]++
+				counter[k]++
 			}
 		}
-		for _, v := range intersection {
+		unions += len(counter)
+		for _, v := range counter {
 			if v == groupSize {
 				intersections++
 			}
 		}
 	}
+	fmt.Println("Union: ", unions)
 	fmt.Println("Intersection: ", intersections)
 }
