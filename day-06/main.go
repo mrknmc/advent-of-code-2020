@@ -1,0 +1,64 @@
+package main
+
+import (
+	"bufio"
+	"fmt"
+	"os"
+)
+
+func parseFile(file *os.File) [][]map[string]int {
+	fscanner := bufio.NewScanner(file)
+	groups := make([][]map[string]int, 0)
+	group := make([]map[string]int, 0)
+	for fscanner.Scan() {
+		line := fscanner.Text()
+		if line == "" {
+			// new group
+			groups = append(groups, group)
+			group = make([]map[string]int, 0)
+			continue
+		}
+		person := make(map[string]int)
+		for _, part := range line {
+			person[string(part)]++
+		}
+		group = append(group, person)
+	}
+	// add last group
+	groups = append(groups, group)
+	return groups
+}
+
+func main() {
+	file, _ := os.Open("data.txt")
+	groups := parseFile(file)
+
+	unions := 0
+	for _, group := range groups {
+		union := make(map[string]int)
+		for _, person := range group {
+			for k := range person {
+				union[k]++
+			}
+		}
+		unions += len(union)
+	}
+	fmt.Println("Union: ", unions)
+
+	intersections := 0
+	for _, group := range groups {
+		groupSize := len(group)
+		intersection := make(map[string]int)
+		for _, person := range group {
+			for k := range person {
+				intersection[k]++
+			}
+		}
+		for _, v := range intersection {
+			if v == groupSize {
+				intersections++
+			}
+		}
+	}
+	fmt.Println("Intersection: ", intersections)
+}
