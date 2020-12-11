@@ -69,19 +69,13 @@ func main() {
 		diff := longestChain[i+1] - longestChain[i-1]
 		if diff >= 3 {
 			// cannot drop
-			combs := 1.0
-			if inbetween == 0 {
-				combs = 1
-			} else if inbetween == 1 {
-				combs = 2
+			if inbetween == 1 {
+				count *= 2
 			} else if inbetween == 2 {
-				combs = 4
+				count *= 4
 			} else if inbetween == 3 {
-				combs = 7
-			} else {
-				panic("This cannot happen")
+				count *= 7
 			}
-			count *= combs
 			inbetween = 0
 		} else if diff == 2 {
 			// can drop
