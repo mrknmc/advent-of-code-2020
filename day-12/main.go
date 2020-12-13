@@ -8,16 +8,6 @@ import (
 	"strconv"
 )
 
-const (
-	Forward = 'F'
-	Right   = 'R'
-	Left    = 'L'
-	West    = 'W'
-	East    = 'E'
-	South   = 'S'
-	North   = 'N'
-)
-
 type Action struct {
 	name rune
 	val  float64
