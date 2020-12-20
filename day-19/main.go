@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"fmt"
 	"os"
-	"regexp"
 	"strings"
 )
 
@@ -14,23 +13,6 @@ type Node struct {
 	rule     string
 }
 
-// func parseNode(text string) Node {
-// 	if strings.Contains(text, "|") {
-// 		// or node
-// 		orParts := strings.Split(text, " | ")
-// 		for _, orPart := range orParts {
-
-// 		}
-// 	} else if strings.Contains(text, " ") {
-// 		andParts := strings.Split(text, " ")
-// 		for _, andPart := range andParts {
-
-// 		}
-// 	} else if regexp.MatchString(text, `"\w+"`) {
-
-// 	}
-// }
-
 func reverse(items *[]string) {
 	for i, j := 0, len(*items)-1; i < j; i, j = i+1, j-1 {
 		(*items)[i], (*items)[j] = (*items)[j], (*items)[i]
@@ -38,73 +20,47 @@ func reverse(items *[]string) {
 }
 
 func buildGraph(rules map[string]string, rule string, appendix *Node) *Node {
-	rawStringRegex := regexp.MustCompile(`"(\w+)"`)
-	singleRuleRegex := regexp.MustCompile(`(\d)`)
+	// or nodes
 	if strings.Contains(rule, "|") {
-		// or node
 		orParts := strings.Split(rule, " | ")
 		children := make([]*Node, len(orParts))
-		for _, orPart := range orParts {
-			child := buildGraph(rules, orPart, nil)
-			children = append(children, child)
+		for i, orPart := range orParts {
+			children[i] = buildGraph(rules, orPart, appendix)
 		}
 		return &Node{children, "", rule}
-	} else if strings.Contains(rule, " ") {
-		// chain nodes
-		chainParts := strings.Split(rule, " ")
-		// start from the back
-		reverse(&chainParts)
-		var appendix *Node = nil
-		for _, chainPart := range chainParts {
-			appendix = buildGraph(rules, chainPart, appendix)
-		}
-		return &Node{[]*Node{appendix}, "", rule}
-	} else if matches := rawStringRegex.FindStringSubmatch(rule); len(matches) > 1 {
-		// raw string => appendix attached at the end
-		return &Node{[]*Node{appendix}, matches[1], rule}
-	} else if singleRuleRegex.MatchString(rule) {
-		// one rule Node
-		child := buildGraph(rules, rules[rule], nil)
-		return &Node{[]*Node{child}, "", rule}
 	}
 
-	panic("Impossible state")
+	// raw string
+	var value string
+	if _, err := fmt.Sscanf(rule, "%q", &value); err == nil {
+		if appendix != nil {
+			// raw string => appendix attached at the end
+			return &Node{[]*Node{appendix}, value, rule}
+		}
+		return &Node{nil, value, rule}
+	}
+
+	// chain nodes
+	chainParts := strings.Split(rule, " ")
+	// start from the back
+	reverse(&chainParts)
+	for _, chainPart := range chainParts {
+		appendix = buildGraph(rules, rules[chainPart], appendix)
+	}
+	return &Node{[]*Node{appendix}, "", rule}
 }
 
-func explore(rules map[string]string, rule string, message string) bool {
-	rawStringRegex := regexp.MustCompile(`"(\w+)"`)
-	singleRuleRegex := regexp.MustCompile(`(\d)`)
-	if strings.Contains(rule, "|") {
-		// or node
-		orParts := strings.Split(rule, " | ")
-		for _, orPart := range orParts {
-			if explore(rules, orPart, rule) {
-				return true
-			}
-		}
-		// no child matched
+func matchMessage(node *Node, message string) bool {
+	if node.value != "" && node.value != string(message[0]) {
 		return false
-	} else if strings.Contains(rule, " ") {
-		// chain nodes
-		// TODO: doesn't work
-		chainParts := strings.Split(rule, " ")
-		for _, chainPart := range chainParts {
-			// tmpNode := returnNode
-			if !explore(rules, chainPart, message) {
-				return false
-			}
-		}
-		// all children matched
-		return true
-	} else if matches := rawStringRegex.FindStringSubmatch(rule); len(matches) > 1 {
-		// raw string
-		return matches[1] == rule
-	} else if singleRuleRegex.MatchString(rule) {
-		// one rule Node
-		return explore(rules, rule, message)
 	}
-
-	panic("Impossible state")
+	trimmedMessage := strings.TrimPrefix(message, node.value)
+	for _, child := range node.children {
+		if matchMessage(child, trimmedMessage) {
+			return true
+		}
+	}
+	return trimmedMessage == ""
 }
 
 func main() {
@@ -127,7 +83,13 @@ func main() {
 		messages = append(messages, line)
 	}
 
-	// root := buildGraph(rules, rules["0"])
-	match := buildGraph(rules, rules["0"], nil)
-	fmt.Println(match)
+	root := buildGraph(rules, rules["0"], nil)
+	// fmt.Println(root)
+	counter := 0
+	for _, message := range messages {
+		if matchMessage(root, message) {
+			counter++
+		}
+	}
+	fmt.Println(counter)
 }
